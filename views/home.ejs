@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+
+<h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-indigo-600 pl-3">Truyện Mới Cập Nhật</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+    <% stories.forEach(story => { %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden flex hover:shadow-xl transition card-story">
+            <img src="<%= story.cover || 'https://via.placeholder.com/150' %>" class="w-32 h-auto object-cover">
+            <div class="p-4 flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="font-bold text-lg text-indigo-700 mb-1">
+                        <a href="/story/<%= story.id %>"><%= story.title %></a>
+                    </h3>
+                    <div class="flex flex-wrap gap-1 mb-2">
+                        <% story.tags.forEach(t => { %>
+                            <span class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full"><%= t.name %></span>
+                        <% }) %>
+                    </div>
+                    <p class="text-sm text-gray-500 line-clamp-2"><%= story.preview %></p>
+                </div>
+            </div>
+        </div>
+    <% }) %>
+</div>
+
+<div class="mt-8 flex justify-center gap-2">
+    <% if(page > 1) { %> <a href="/?page=<%= page - 1 %>" class="bg-white px-4 py-2 rounded border hover:bg-gray-100">Trước</a> <% } %>
+    <span class="px-4 py-2 font-bold text-indigo-600">Trang <%= page %></span>
+    <a href="/?page=<%= page + 1 %>" class="bg-white px-4 py-2 rounded border hover:bg-gray-100">Sau</a>
+</div>
+
+<%- include('partials/footer') %>

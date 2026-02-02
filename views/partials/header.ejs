@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Truyện Docker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    <nav class="bg-indigo-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold uppercase tracking-wider">📖 Truyện Pro</a>
+            
+            <form action="/" method="GET" class="hidden md:flex bg-indigo-800 rounded overflow-hidden">
+                <input type="text" name="search" placeholder="Tìm truyện..." class="bg-transparent px-3 py-1 outline-none text-white placeholder-indigo-300">
+                <button class="px-3 bg-indigo-900 hover:bg-indigo-600 transition">🔍</button>
+            </form>
+
+            <div class="text-sm">
+                <% if (typeof user !== 'undefined' && user) { %>
+                    <span class="mr-2 opacity-80">Chào, <%= user.username %></span>
+                    <% if(user.role === 'admin') { %>
+                        <a href="/admin" class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-white font-bold transition">Quản lý</a>
+                    <% } %>
+                <% } else { %>
+                    <a href="/login" class="hover:underline">Đăng nhập</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-grow container mx-auto px-4 py-6">

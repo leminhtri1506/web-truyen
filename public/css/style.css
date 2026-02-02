@@ -1,0 +1,28 @@
+/* Tùy chỉnh thanh cuộn cho đẹp */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Class riêng cho nội dung truyện để dễ đọc */
+.chapter-content {
+    font-family: 'Merriweather', serif; /* Font chữ có chân dễ đọc */
+    line-height: 1.8;
+    font-size: 1.2rem;
+    text-align: justify;
+    color: #333;
+}
+
+.card-story:hover {
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}

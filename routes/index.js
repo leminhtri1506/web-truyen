@@ -33,8 +33,10 @@ router.get('/', (req, res) => {
     });
 });
 
-// Trang Login
-router.get('/login', (req, res) => res.render('login'));
+router.get('/login', (req, res) => {
+    // Truyền biến user (dù chưa đăng nhập thì là null) để header không bị lỗi
+    res.render('login', { user: req.session.user }); 
+});
 
 // Xử lý Đăng ký (User đầu tiên là Admin)
 router.post('/register', (req, res) => {

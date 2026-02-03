@@ -88,13 +88,30 @@ router.get('/story/:id', (req, res) => {
     });
 });
 
-// Đọc truyện
-router.get('/read/:chapterId', (req, res) => {
-    db.get("SELECT * FROM chapters WHERE id = ?", [req.params.chapterId], (err, chapter) => {
-        if (!chapter) return res.send("Lỗi chương");
-        db.get("SELECT id FROM chapters WHERE story_id = ? AND id < ? ORDER BY id DESC LIMIT 1", [chapter.story_id, chapter.id], (err, prev) => {
-            db.get("SELECT id FROM chapters WHERE story_id = ? AND id > ? ORDER BY id ASC LIMIT 1", [chapter.story_id, chapter.id], (err, next) => {
-                res.render('read', { chapter, prev, next });
+router.get('/read/:id', (req, res) => {
+    const chapterId = req.params.id;
+
+    db.get("SELECT * FROM chapters WHERE id = ?", [chapterId], (err, chapter) => {
+        if (err || !chapter) {
+            return res.status(404).send("Chương này không tồn tại hoặc đã bị xóa.");
+        }
+
+        db.get("SELECT * FROM stories WHERE id = ?", [chapter.story_id], (err, story) => {
+            
+            db.all("SELECT id FROM chapters WHERE story_id = ? ORDER BY id ASC", [chapter.story_id], (err, allChapters) => {
+                
+                const currentIndex = allChapters.findIndex(c => c.id == chapterId);
+                
+                const prevChapter = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
+                const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
+
+                res.render('read', {
+                    story: story,
+                    chapter: chapter,
+                    prevChapter: prevChapter,
+                    nextChapter: nextChapter,
+                    user: req.session.user
+                });
             });
         });
     });

@@ -63,13 +63,26 @@ router.post('/login', (req, res) => {
 });
 
 // Xem chi tiết truyện
+// Xem chi tiết truyện
 router.get('/story/:id', (req, res) => {
     const id = req.params.id;
+    // Lấy thông tin truyện
     db.get("SELECT * FROM stories WHERE id = ?", [id], (err, story) => {
-        if (!story) return res.send("Truyện không tồn tại");
+        if (!story) return res.send("Truyện không tồn tại"); // Báo lỗi nếu ID sai
+
+        // Lấy danh sách chương
         db.all("SELECT * FROM chapters WHERE story_id = ? ORDER BY id ASC", [id], (err, chapters) => {
+            
+            // Lấy danh sách Tags
             db.all(`SELECT t.name FROM tags t JOIN story_tags st ON t.id = st.tag_id WHERE st.story_id = ?`, [id], (err, tags) => {
-                res.render('story', { story, chapters, tags, user: req.session.user });
+                
+                // Render giao diện và truyền đầy đủ biến
+                res.render('story', { 
+                    story: story, 
+                    chapters: chapters, 
+                    tags: tags, 
+                    user: req.session.user // <--- QUAN TRỌNG: Phải có dòng này mới hiện Header
+                });
             });
         });
     });

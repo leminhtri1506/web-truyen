@@ -4,41 +4,46 @@ const db = require('../database');
 const md5 = require('md5');
 
 // Trang chủ & Tìm kiếm
+// routes/index.js
+
+// Trang chủ (Có phân trang)
 router.get('/', (req, res) => {
+    // 1. Xác định trang hiện tại (mặc định là 1)
     const page = parseInt(req.query.page) || 1;
-    const limit = 20;
+    const limit = 10; 
     const offset = (page - 1) * limit;
-    const search = req.query.search || '';
 
-    let sql = `SELECT s.* FROM stories s WHERE s.title LIKE ? ORDER BY s.id DESC LIMIT ? OFFSET ?`;
-    
-    db.all(sql, [`%${search}%`, limit, offset], (err, stories) => {
-        const promises = stories.map(story => {
-            return new Promise((resolve) => {
-                // Lấy tags
-                db.all(`SELECT t.name FROM tags t JOIN story_tags st ON t.id = st.tag_id WHERE st.story_id = ?`, [story.id], (err, tags) => {
-                    story.tags = tags;
-                    // Lấy đoạn đầu chương 1 để preview
-                    db.get(`SELECT content FROM chapters WHERE story_id = ? ORDER BY id ASC LIMIT 1`, [story.id], (err, chap) => {
-                        story.preview = chap ? chap.content.substring(0, 150) + '...' : 'Chưa có chương nào';
-                        resolve();
-                    });
-                });
+    db.get("SELECT COUNT(*) as count FROM stories", [], (err, row) => {
+        if (err) {
+            console.error(err);
+            return res.send("Lỗi Database");
+        }
+
+        const totalStories = row.count;
+        const totalPages = Math.ceil(totalStories / limit);
+
+        // 3. Lấy danh sách truyện cho trang hiện tại (Sắp xếp mới nhất trước)
+        db.all("SELECT * FROM stories ORDER BY id DESC LIMIT ? OFFSET ?", [limit, offset], (err, stories) => {
+            if (err) {
+                console.error(err);
+                return res.send("Lỗi lấy danh sách truyện");
+            }
+
+            // 4. Render và GỬI BIẾN currentPage SANG VIEW (Khắc phục lỗi)
+            res.render('home', {
+                stories: stories,
+                user: req.session.user,
+                currentPage: page,       // <--- Đây là biến bị thiếu
+                totalPages: totalPages   // <--- Đây là biến bị thiếu
             });
-        });
-
-        Promise.all(promises).then(() => {
-            res.render('home', { stories, page, search, user: req.session.user });
         });
     });
 });
 
 router.get('/login', (req, res) => {
-    // Truyền biến user (dù chưa đăng nhập thì là null) để header không bị lỗi
     res.render('login', { user: req.session.user }); 
 });
 
-// Xử lý Đăng ký (User đầu tiên là Admin)
 router.post('/register', (req, res) => {
     const { username, password } = req.body;
     db.get("SELECT count(*) as count FROM users", (err, row) => {
@@ -62,8 +67,6 @@ router.post('/login', (req, res) => {
     });
 });
 
-// Xem chi tiết truyện
-// Xem chi tiết truyện
 router.get('/story/:id', (req, res) => {
     const id = req.params.id;
     // Lấy thông tin truyện

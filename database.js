@@ -1,5 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const md5 = require('md5');
+const fs = require('fs');    // <--- Thêm thư viện quản lý file
+const path = require('path');
 
 // Database sẽ được lưu vào file truyen.db
 const db = new sqlite3.Database('./truyen.db');

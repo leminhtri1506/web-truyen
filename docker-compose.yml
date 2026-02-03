@@ -2,14 +2,13 @@ version: '3.8'
 
 services:
   app:
+    image: tri48/web-truyen:latest # (Hoặc build: . tùy bạn)
     container_name: web-truyen
-    build: .
     restart: unless-stopped
     ports:
       - "1506:1506"
     volumes:
-      - ./truyen.db:/app/truyen.db
-      - ./sessions.db:/app/sessions.db  
+      - ./data:/app/data
       - ./public/uploads:/app/public/uploads
     environment:
       - NODE_ENV=production

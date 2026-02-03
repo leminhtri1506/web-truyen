@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
     store: new SQLiteStore({
         db: 'sessions.db', // Tên file chứa session
-        dir: './',         // Lưu cùng thư mục với app
+        dir: './data',         // Lưu cùng thư mục với app
         concurrentDB: true
     }),
     secret: 'bi-mat-cua-ban',

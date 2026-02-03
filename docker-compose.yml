@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: web-truyen
+    build: .                        # Tự động build từ Dockerfile ở thư mục hiện tại
+    restart: unless-stopped         # Tự khởi động lại nếu server reboot hoặc crash
+    ports:
+      - "1506:1506"                 # Map port 1506 ra ngoài
+    volumes:
+      - ./truyen.db:/app/truyen.db                 # Mount file database để không mất dữ liệu
+      - ./public/uploads:/app/public/uploads       # Mount thư mục ảnh bìa
+    environment:
+      - NODE_ENV=production

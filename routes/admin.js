@@ -55,4 +55,49 @@ router.post('/add-chapter', requireAdmin, (req, res) => {
     });
 });
 
+router.get('/edit-chapter/:id', requireAdmin, (req, res) => {
+    const id = req.params.id;
+    db.get("SELECT * FROM chapters WHERE id = ?", [id], (err, chapter) => {
+        if (!chapter) return res.send("Chương không tồn tại");
+        
+        res.render('edit_chapter', { 
+            chapter: chapter, 
+            user: req.session.user 
+        });
+    });
+});
+
+// 2. Xử lý Lưu thay đổi
+router.post('/edit-chapter/:id', requireAdmin, (req, res) => {
+    const id = req.params.id;
+    const { title, content } = req.body;
+
+    db.run("UPDATE chapters SET title = ?, content = ? WHERE id = ?", [title, content, id], (err) => {
+        if (err) {
+            console.log(err);
+            return res.send("Lỗi khi cập nhật chương");
+        }
+        // Cập nhật xong thì tìm story_id để quay lại trang truyện
+        db.get("SELECT story_id FROM chapters WHERE id = ?", [id], (err, row) => {
+            res.redirect('/story/' + row.story_id);
+        });
+    });
+});
+
+// --- CHỨC NĂNG MỚI: XÓA CHƯƠNG ---
+router.get('/delete-chapter/:id', requireAdmin, (req, res) => {
+    const id = req.params.id;
+
+    // Lấy story_id trước để redirect sau khi xóa
+    db.get("SELECT story_id FROM chapters WHERE id = ?", [id], (err, row) => {
+        if (!row) return res.send("Lỗi");
+        const storyId = row.story_id;
+
+        db.run("DELETE FROM chapters WHERE id = ?", [id], (err) => {
+            if (err) return res.send("Lỗi xóa chương");
+            res.redirect('/story/' + storyId);
+        });
+    });
+});
+
 module.exports = router;

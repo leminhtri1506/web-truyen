@@ -96,11 +96,24 @@
         <% if(chapters.length === 0) { %>
             <p class="text-gray-500 italic ml-4">Chưa có chương nào được đăng.</p>
         <% } else { %>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <% chapters.forEach(c => { %>
-                    <a href="/read/<%= c.id %>" class="block bg-white p-3 rounded border hover:bg-indigo-50 hover:border-indigo-300 transition truncate text-gray-700 text-sm">
-                        <%= c.title %>
-                    </a>
+                    <div class="flex items-center justify-between bg-white p-3 rounded border hover:shadow-sm transition group">
+                        <a href="/read/<%= c.id %>" class="truncate text-gray-700 text-sm font-medium hover:text-indigo-600 flex-1">
+                            <%= c.title %>
+                        </a>
+
+                        <% if(user && user.role === 'admin') { %>
+                            <div class="flex gap-2 ml-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="/admin/edit-chapter/<%= c.id %>" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded border border-yellow-300 hover:bg-yellow-200">
+                                    Sửa
+                                </a>
+                                <a href="/admin/delete-chapter/<%= c.id %>" onclick="return confirm('Bạn có chắc chắn muốn xóa chương này? Hành động này không thể hoàn tác!')" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded border border-red-300 hover:bg-red-200">
+                                    Xóa
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
                 <% }) %>
             </div>
         <% } %>

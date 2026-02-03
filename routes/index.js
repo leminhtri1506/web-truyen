@@ -72,18 +72,35 @@ router.get('/story/:id', (req, res) => {
         if (!story) return res.send("Truyện không tồn tại"); // Báo lỗi nếu ID sai
 
         // Lấy danh sách chương
-        db.all("SELECT * FROM chapters WHERE story_id = ? ORDER BY id ASC", [id], (err, chapters) => {
+        db.all("SELECT id, title FROM chapters WHERE story_id = ? ORDER BY id ASC", [id], (err, allChapters) => { // Lưu ý: Code cũ của bạn có thể đang dùng biến 'chapters' hoặc 'allChapters', hãy chú ý tên biến
             
-            // Lấy danh sách Tags
-            db.all(`SELECT t.name FROM tags t JOIN story_tags st ON t.id = st.tag_id WHERE st.story_id = ?`, [id], (err, tags) => {
+            // --- ĐOẠN CODE MỚI: TÍNH SỐ CHƯƠNG TIẾP THEO ---
+            let nextChapterTitle = "Chương 1: "; // Mặc định nếu chưa có chương nào
+            
+            if (allChapters && allChapters.length > 0) {
+                // Lấy chương cuối cùng được đăng
+                const lastChapter = allChapters[allChapters.length - 1];
                 
-                // Render giao diện và truyền đầy đủ biến
-                res.render('story', { 
-                    story: story, 
-                    chapters: chapters, 
-                    tags: tags, 
-                    user: req.session.user // <--- QUAN TRỌNG: Phải có dòng này mới hiện Header
-                });
+                // Dùng Regex để tìm con số trong tiêu đề chương cũ (Ví dụ: "Chương 99:..." -> lấy số 99)
+                const match = lastChapter.title.match(/Chương\s+(\d+)/i) || lastChapter.title.match(/(\d+)/);
+                
+                if (match) {
+                    const nextNum = parseInt(match[1]) + 1;
+                    nextChapterTitle = `Chương ${nextNum}: `;
+                } else {
+                    // Nếu không tìm thấy số, cứ lấy tổng số chương + 1
+                    nextChapterTitle = `Chương ${allChapters.length + 1}: `;
+                }
+            }
+            // -----------------------------------------------
+
+            // Render giao diện và GỬI THÊM BIẾN nextChapterTitle
+            res.render('story', { 
+                story: story, 
+                chapters: allChapters, // Hoặc 'chapters' tùy code cũ của bạn
+                tags: tags, 
+                user: req.session.user,
+                nextChapterTitle: nextChapterTitle // <--- Gửi biến này sang View
             });
         });
     });

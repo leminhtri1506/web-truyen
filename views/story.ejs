@@ -53,10 +53,11 @@
 
     <% if(user && user.role === 'admin') { %>
         <div class="px-6 mb-4">
-            <details class="group bg-yellow-50 border border-yellow-200 rounded-lg overflow-hidden">
+            <details class="group bg-yellow-50 border border-yellow-200 rounded-lg overflow-hidden" open>
+                
                 <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-4 bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition">
                     <span class="flex items-center gap-2">
-                        ⚙️ Admin Panel: Quản lý chương
+                        ⚙️ Admin Panel: Thêm chương mới (Tự động)
                     </span>
                     <span class="transition group-open:rotate-180">
                         <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
@@ -69,14 +70,14 @@
                         
                         <div class="mb-3">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Tên chương:</label>
-                            <input type="text" name="title" placeholder="Ví dụ: Chương 10: Đại chiến" 
-                                   class="w-full border p-2 rounded focus:outline-none focus:border-indigo-500" required>
+                            <input type="text" name="title" value="<%= nextChapterTitle %>" 
+                                   class="w-full border p-2 rounded focus:outline-none focus:border-indigo-500 font-bold text-gray-800" required>
                         </div>
                         
                         <div class="mb-3">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nội dung chương:</label>
                             <textarea name="content" rows="10" placeholder="Paste nội dung vào đây..." 
-                                      class="w-full border p-2 rounded focus:outline-none focus:border-indigo-500 font-mono text-sm" required></textarea>
+                                      class="w-full border p-2 rounded focus:outline-none focus:border-indigo-500 font-mono text-sm" required autofocus></textarea>
                         </div>
         
                         <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow transition">

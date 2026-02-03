@@ -48,7 +48,7 @@
                                 
                                 if (story.latest_content) {
                                     // Nếu có chương mới: Lấy 150 ký tự đầu tiên
-                                    previewText = "📖 Trích đoạn: " + story.latest_content.substring(0, 150) + "...";
+                                    previewText = story.latest_content.substring(0, 150) + "...";
                                 } else {
                                     // Nếu chưa có chương: Lấy mô tả
                                     previewText = story.description ? story.description : 'Chưa có mô tả...';

@@ -45,6 +45,7 @@ db.serialize(() => {
         title TEXT,
         description TEXT,
         cover TEXT,
+        status TEXT DEFAULT 'Đang cập nhật',  -- <--- THÊM DÒNG NÀY
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 

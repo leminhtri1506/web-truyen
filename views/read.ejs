@@ -57,15 +57,11 @@
         background-color: var(--hover-bg);
         color: var(--text-primary);
     }
-    body.dark-mode .btn-primary {
-        background-color: var(--highlight);
-        color: #fff;
-    }
 </style>
 
 <div class="app-bg min-h-screen pb-10 font-ui relative">
     
-    <div id="toc-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+    <div id="toc-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[100] flex items-center justify-center p-4">
         <div class="app-paper rounded-lg shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col border app-border">
             <div class="p-4 border-b app-border flex justify-between items-center bg-indigo-600 text-white rounded-t-lg">
                 <h3 class="font-bold text-lg">Danh Sách Chương</h3>
@@ -98,7 +94,7 @@
             <p class="app-text-sub text-sm">Đăng ngày: <%= new Date(chapter.created_at).toLocaleDateString('vi-VN') %></p>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 px-4 text-sm font-bold sticky top-0 app-paper py-3 border-b app-border z-10 shadow-sm transition-colors duration-300">
+        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 px-4 text-sm font-bold sticky top-[60px] md:top-[70px] app-paper py-3 border-b app-border z-40 shadow-sm transition-colors duration-300">
             <% if (prevChapter) { %>
                 <a href="/read/<%= prevChapter.id %>" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center">
                     ⬅ <span class="hidden md:inline ml-1">Trước</span>
@@ -107,11 +103,11 @@
                 <button class="btn-nav opacity-50 cursor-not-allowed px-3 py-2 rounded">⬅ <span class="hidden md:inline ml-1">Trước</span></button>
             <% } %>
 
-            <button onclick="toggleTOC()" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2">
+            <button onclick="toggleTOC()" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 cursor-pointer">
                 <span>📑</span> <span class="hidden sm:inline">Mục lục</span>
             </button>
 
-            <button onclick="toggleTheme()" id="theme-btn" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
+            <button onclick="toggleTheme()" id="theme-btn" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 text-yellow-600 dark:text-yellow-400 cursor-pointer">
                 <span id="theme-icon">☀</span> <span class="hidden sm:inline">Giao diện</span>
             </button>
 
@@ -176,9 +172,9 @@
     // Nếu trước đó chọn dark thì bật lên ngay lập tức
     if (savedTheme === 'dark') {
         body.classList.add('dark-mode');
-        themeIcon.innerText = '🌙'; // Icon mặt trăng
+        if(themeIcon) themeIcon.innerText = '🌙'; 
     } else {
-        themeIcon.innerText = '☀'; // Icon mặt trời
+        if(themeIcon) themeIcon.innerText = '☀'; 
     }
 
     // Hàm chuyển đổi
@@ -187,10 +183,10 @@
         
         if (body.classList.contains('dark-mode')) {
             localStorage.setItem('theme', 'dark');
-            themeIcon.innerText = '🌙';
+            if(themeIcon) themeIcon.innerText = '🌙';
         } else {
             localStorage.setItem('theme', 'light');
-            themeIcon.innerText = '☀';
+            if(themeIcon) themeIcon.innerText = '☀';
         }
     }
 </script>

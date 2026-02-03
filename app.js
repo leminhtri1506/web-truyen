@@ -4,7 +4,7 @@ const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session); // Thêm dòng này
 const multer = require('multer');
 const path = require('path');
-const db = require('./db'); // (Lưu ý: file database của bạn tên là db.js hay database.js? Kiểm tra lại tên file import này nhé. Trong code cũ là db.js, nếu bạn đổi tên file thì sửa dòng này)
+const db = require('./database');
 const md5 = require('md5');
 
 const app = express();

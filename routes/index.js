@@ -65,42 +65,40 @@ router.post('/login', (req, res) => {
     });
 });
 
+// Xem chi tiết truyện
 router.get('/story/:id', (req, res) => {
     const id = req.params.id;
-    // Lấy thông tin truyện
-    db.get("SELECT * FROM stories WHERE id = ?", [id], (err, story) => {
-        if (!story) return res.send("Truyện không tồn tại"); // Báo lỗi nếu ID sai
 
-        // Lấy danh sách chương
-        db.all("SELECT id, title FROM chapters WHERE story_id = ? ORDER BY id ASC", [id], (err, allChapters) => { // Lưu ý: Code cũ của bạn có thể đang dùng biến 'chapters' hoặc 'allChapters', hãy chú ý tên biến
+    // 1. Lấy thông tin truyện
+    db.get("SELECT * FROM stories WHERE id = ?", [id], (err, story) => {
+        if (!story) return res.send("Truyện không tồn tại");
+
+        // 2. Lấy danh sách chương
+        db.all("SELECT id, title FROM chapters WHERE story_id = ? ORDER BY id ASC", [id], (err, allChapters) => {
             
-            // --- ĐOẠN CODE MỚI: TÍNH SỐ CHƯƠNG TIẾP THEO ---
-            let nextChapterTitle = "Chương 1: "; // Mặc định nếu chưa có chương nào
-            
+            // --- LOGIC MỚI: TÍNH SỐ CHƯƠNG TIẾP THEO ---
+            let nextChapterTitle = "Chương 1: "; 
             if (allChapters && allChapters.length > 0) {
-                // Lấy chương cuối cùng được đăng
                 const lastChapter = allChapters[allChapters.length - 1];
-                
-                // Dùng Regex để tìm con số trong tiêu đề chương cũ (Ví dụ: "Chương 99:..." -> lấy số 99)
+                // Tìm số trong tiêu đề chương cuối (VD: Chương 99 -> lấy 99)
                 const match = lastChapter.title.match(/Chương\s+(\d+)/i) || lastChapter.title.match(/(\d+)/);
-                
                 if (match) {
                     const nextNum = parseInt(match[1]) + 1;
                     nextChapterTitle = `Chương ${nextNum}: `;
                 } else {
-                    // Nếu không tìm thấy số, cứ lấy tổng số chương + 1
                     nextChapterTitle = `Chương ${allChapters.length + 1}: `;
                 }
             }
-            // -----------------------------------------------
-
-            // Render giao diện và GỬI THÊM BIẾN nextChapterTitle
-            res.render('story', { 
-                story: story, 
-                chapters: allChapters, // Hoặc 'chapters' tùy code cũ của bạn
-                tags: tags, 
-                user: req.session.user,
-                nextChapterTitle: nextChapterTitle // <--- Gửi biến này sang View
+            db.all(`SELECT t.name FROM tags t JOIN story_tags st ON t.id = st.tag_id WHERE st.story_id = ?`, [id], (err, tags) => {
+                
+                // 4. Render và gửi đầy đủ biến
+                res.render('story', { 
+                    story: story, 
+                    chapters: allChapters, 
+                    tags: tags, // Bây giờ biến này đã có dữ liệu
+                    user: req.session.user,
+                    nextChapterTitle: nextChapterTitle
+                });
             });
         });
     });

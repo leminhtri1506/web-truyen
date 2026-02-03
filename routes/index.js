@@ -8,33 +8,31 @@ const md5 = require('md5');
 
 // Trang chủ (Có phân trang)
 router.get('/', (req, res) => {
-    // 1. Xác định trang hiện tại (mặc định là 1)
     const page = parseInt(req.query.page) || 1;
-    const limit = 10; 
+    const limit = 12;
     const offset = (page - 1) * limit;
 
     db.get("SELECT COUNT(*) as count FROM stories", [], (err, row) => {
-        if (err) {
-            console.error(err);
-            return res.send("Lỗi Database");
-        }
+        if (err) return res.send("Lỗi Database");
 
         const totalStories = row.count;
         const totalPages = Math.ceil(totalStories / limit);
+        const sql = `
+            SELECT s.*, 
+            (SELECT content FROM chapters WHERE story_id = s.id ORDER BY id DESC LIMIT 1) as latest_content 
+            FROM stories s 
+            ORDER BY s.id DESC 
+            LIMIT ? OFFSET ?
+        `;
 
-        // 3. Lấy danh sách truyện cho trang hiện tại (Sắp xếp mới nhất trước)
-        db.all("SELECT * FROM stories ORDER BY id DESC LIMIT ? OFFSET ?", [limit, offset], (err, stories) => {
-            if (err) {
-                console.error(err);
-                return res.send("Lỗi lấy danh sách truyện");
-            }
+        db.all(sql, [limit, offset], (err, stories) => {
+            if (err) return res.send("Lỗi lấy danh sách truyện");
 
-            // 4. Render và GỬI BIẾN currentPage SANG VIEW (Khắc phục lỗi)
             res.render('home', {
                 stories: stories,
                 user: req.session.user,
-                currentPage: page,       // <--- Đây là biến bị thiếu
-                totalPages: totalPages   // <--- Đây là biến bị thiếu
+                currentPage: page,
+                totalPages: totalPages
             });
         });
     });

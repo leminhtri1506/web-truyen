@@ -41,9 +41,21 @@
                                 </h3>
                             </a>
 
-                            <p class="text-sm text-gray-500 line-clamp-3 leading-relaxed text-justify">
-                                <%= story.description ? story.description : 'Chưa có mô tả cho truyện này...' %>
-                            </p>
+                            <p class="text-sm text-gray-500 line-clamp-3 leading-relaxed text-justify font-serif">
+                            <% 
+                                // Logic: Ưu tiên hiển thị nội dung chương mới nhất
+                                let previewText = "";
+                                
+                                if (story.latest_content) {
+                                    // Nếu có chương mới: Lấy 150 ký tự đầu tiên
+                                    previewText = "📖 Trích đoạn: " + story.latest_content.substring(0, 150) + "...";
+                                } else {
+                                    // Nếu chưa có chương: Lấy mô tả
+                                    previewText = story.description ? story.description : 'Chưa có mô tả...';
+                                }
+                            %>
+                            <%= previewText %>
+                        </p>
                         </div>
 
                         <div class="mt-2 flex justify-end">

@@ -1,14 +1,15 @@
-version: '3.8'
-
 services:
   app:
-    image: tri48/web-truyen:latest # (Hoặc build: . tùy bạn)
+    # Dùng build: . để đóng gói từ code hiện tại thay vì tải từ mạng
+    build: .
     container_name: web-truyen
     restart: unless-stopped
     ports:
       - "1506:1506"
     volumes:
+      # Mount cả thư mục data (Docker sẽ tự tạo thư mục này nếu chưa có)
       - ./data:/app/data
+      # Mount thư mục uploads ảnh
       - ./public/uploads:/app/public/uploads
     environment:
       - NODE_ENV=production

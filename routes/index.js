@@ -98,7 +98,7 @@ router.get('/read/:id', (req, res) => {
 
         db.get("SELECT * FROM stories WHERE id = ?", [chapter.story_id], (err, story) => {
             
-            db.all("SELECT id FROM chapters WHERE story_id = ? ORDER BY id ASC", [chapter.story_id], (err, allChapters) => {
+            db.all("SELECT id, title FROM chapters WHERE story_id = ? ORDER BY id ASC", [chapter.story_id], (err, allChapters) => {
                 
                 const currentIndex = allChapters.findIndex(c => c.id == chapterId);
                 
@@ -110,6 +110,7 @@ router.get('/read/:id', (req, res) => {
                     chapter: chapter,
                     prevChapter: prevChapter,
                     nextChapter: nextChapter,
+                    allChapters: allChapters, 
                     user: req.session.user
                 });
             });

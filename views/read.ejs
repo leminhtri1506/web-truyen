@@ -7,16 +7,52 @@
 <style>
     .font-reading {
         font-family: 'Merriweather', serif;
-        font-size: 1.25rem; /* ~20px */
-        line-height: 2;     /* Giãn dòng rộng đọc cho sướng */
+        font-size: 1.25rem;
+        line-height: 2;
         color: #333;
     }
     .font-ui {
         font-family: 'Nunito', sans-serif;
     }
+    /* Thanh cuộn đẹp cho mục lục */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1; 
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888; 
+        border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555; 
+    }
 </style>
 
-<div class="bg-[#f9f9f9] min-h-screen pb-10 font-ui"> <div class="max-w-4xl mx-auto bg-white shadow-lg min-h-screen">
+<div class="bg-[#f9f9f9] min-h-screen pb-10 font-ui relative">
+    
+    <div id="toc-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center bg-indigo-600 text-white rounded-t-lg">
+                <h3 class="font-bold text-lg">Danh Sách Chương</h3>
+                <button onclick="toggleTOC()" class="hover:bg-indigo-700 rounded p-1">
+                    ✖ Đóng
+                </button>
+            </div>
+            
+            <div class="overflow-y-auto p-2 custom-scrollbar flex-1">
+                <% allChapters.forEach(c => { %>
+                    <a href="/read/<%= c.id %>" 
+                       class="block px-4 py-3 border-b border-gray-100 hover:bg-indigo-50 transition rounded 
+                       <%= c.id == chapter.id ? 'bg-indigo-100 font-bold text-indigo-800 border-l-4 border-indigo-600' : 'text-gray-700' %>">
+                        <%= c.title %>
+                    </a>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    <div class="max-w-4xl mx-auto bg-white shadow-lg min-h-screen">
         
         <div class="p-4 border-b text-sm text-gray-600">
             <a href="/" class="hover:text-indigo-600">Trang chủ</a> / 
@@ -31,25 +67,25 @@
             <p class="text-gray-500 text-sm">Đăng ngày: <%= new Date(chapter.created_at).toLocaleDateString('vi-VN') %></p>
         </div>
 
-        <div class="flex justify-center gap-4 mb-8 px-4 text-sm font-bold">
+        <div class="flex justify-center gap-2 md:gap-4 mb-8 px-4 text-sm font-bold sticky top-0 bg-white/95 backdrop-blur py-2 border-b z-10 shadow-sm">
             <% if (prevChapter) { %>
-                <a href="/read/<%= prevChapter.id %>" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-indigo-50 hover:border-indigo-500 transition">
-                    ⬅ Trước
+                <a href="/read/<%= prevChapter.id %>" class="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-indigo-50 transition">
+                    ⬅ <span class="hidden md:inline">Trước</span>
                 </a>
             <% } else { %>
-                <button class="bg-gray-100 text-gray-400 border border-gray-200 px-4 py-2 rounded cursor-not-allowed">⬅ Trước</button>
+                <button class="bg-gray-100 text-gray-300 border border-gray-200 px-3 py-2 rounded cursor-not-allowed">⬅ <span class="hidden md:inline">Trước</span></button>
             <% } %>
 
-            <a href="/story/<%= story.id %>" class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition">
-                Mục lục
-            </a>
+            <button onclick="toggleTOC()" class="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition flex items-center gap-2">
+                <span>📑</span> Mục lục
+            </button>
 
             <% if (nextChapter) { %>
-                <a href="/read/<%= nextChapter.id %>" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-indigo-50 hover:border-indigo-500 transition">
-                    Sau ➡
+                <a href="/read/<%= nextChapter.id %>" class="bg-white border border-gray-300 text-gray-700 px-3 py-2 rounded hover:bg-indigo-50 transition">
+                    <span class="hidden md:inline">Sau</span> ➡
                 </a>
             <% } else { %>
-                <button class="bg-gray-100 text-gray-400 border border-gray-200 px-4 py-2 rounded cursor-not-allowed">Sau ➡</button>
+                <button class="bg-gray-100 text-gray-300 border border-gray-200 px-3 py-2 rounded cursor-not-allowed"><span class="hidden md:inline">Sau</span> ➡</button>
             <% } %>
         </div>
 
@@ -77,5 +113,26 @@
 
     </div>
 </div>
+
+<script>
+    function toggleTOC() {
+        const modal = document.getElementById('toc-modal');
+        if (modal.classList.contains('hidden')) {
+            modal.classList.remove('hidden');
+            // Tự động cuộn tới chương đang đọc
+            const activeChapter = modal.querySelector('.bg-indigo-100');
+            if(activeChapter) activeChapter.scrollIntoView({ block: "center" });
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Đóng modal khi bấm ra ngoài vùng trắng
+    document.getElementById('toc-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            toggleTOC();
+        }
+    });
+</script>
 
 <%- include('partials/footer') %>

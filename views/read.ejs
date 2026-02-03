@@ -13,33 +13,28 @@
         --text-secondary: #4a5568;
         --border-color: #e2e8f0;
         --hover-bg: #edf2f7;
-        --highlight: #4f46e5; /* Màu tím Indigo */
+        --highlight: #4f46e5;
     }
 
-    /* Khi body có class 'dark-mode' thì đổi màu biến */
+    /* DARK MODE */
     body.dark-mode {
-        --bg-body: #111111;       /* Nền đen dịu */
-        --bg-paper: #1a1a1a;      /* Giấy nền xám đen */
-        --text-primary: #e0e0e0;  /* Chữ trắng xám cho đỡ chói */
+        --bg-body: #111111;
+        --bg-paper: #1a1a1a;
+        --text-primary: #e0e0e0;
         --text-secondary: #a0aec0;
         --border-color: #2d3748;
         --hover-bg: #2d3748;
-        --highlight: #818cf8;     /* Tím sáng hơn */
+        --highlight: #818cf8;
     }
 
-    /* Áp dụng biến màu vào giao diện */
+    /* Áp dụng biến màu */
     .app-bg { background-color: var(--bg-body); color: var(--text-primary); transition: background 0.3s, color 0.3s; }
     .app-paper { background-color: var(--bg-paper); border-color: var(--border-color); }
     .app-text-main { color: var(--text-primary); }
     .app-text-sub { color: var(--text-secondary); }
     .app-border { border-color: var(--border-color); }
     
-    /* Font chữ */
-    .font-reading {
-        font-family: 'Merriweather', serif;
-        font-size: 1.25rem;
-        line-height: 2;
-    }
+    .font-reading { font-family: 'Merriweather', serif; font-size: 1.25rem; line-height: 2; }
     .font-ui { font-family: 'Nunito', sans-serif; }
 
     /* Scrollbar */
@@ -47,25 +42,25 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-body); }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #888; border-radius: 3px; }
 
-    /* Button styles riêng cho Darkmode */
+    /* Nút điều hướng */
     .btn-nav {
         background-color: var(--bg-paper);
         border: 1px solid var(--border-color);
         color: var(--text-secondary);
+        cursor: pointer; /* Bắt buộc có để click được */
+        position: relative;
+        z-index: 50; /* Đảm bảo nút nổi lên trên */
     }
-    body.dark-mode .btn-nav:hover {
-        background-color: var(--hover-bg);
-        color: var(--text-primary);
-    }
+    body.dark-mode .btn-nav:hover { background-color: var(--hover-bg); color: var(--text-primary); }
 </style>
 
 <div class="app-bg min-h-screen pb-10 font-ui relative">
     
-    <div id="toc-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[100] flex items-center justify-center p-4">
-        <div class="app-paper rounded-lg shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col border app-border">
+    <div id="toc-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 z-[9999] flex items-center justify-center p-4">
+        <div class="app-paper rounded-lg shadow-2xl w-full max-w-md max-h-[80vh] flex flex-col border app-border relative z-[10000]">
             <div class="p-4 border-b app-border flex justify-between items-center bg-indigo-600 text-white rounded-t-lg">
                 <h3 class="font-bold text-lg">Danh Sách Chương</h3>
-                <button onclick="toggleTOC()" class="hover:bg-indigo-700 rounded p-1">✖ Đóng</button>
+                <button id="close-toc-btn" class="hover:bg-indigo-700 rounded p-1 cursor-pointer">✖ Đóng</button>
             </div>
             <div class="overflow-y-auto p-2 custom-scrollbar flex-1">
                 <% allChapters.forEach(c => { %>
@@ -79,7 +74,7 @@
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto app-paper shadow-lg min-h-screen transition-colors duration-300">
+    <div class="max-w-4xl mx-auto app-paper shadow-lg min-h-screen transition-colors duration-300 relative z-10">
         
         <div class="p-4 border-b app-border text-sm app-text-sub">
             <a href="/" class="hover:text-indigo-500">Trang chủ</a> / 
@@ -94,7 +89,7 @@
             <p class="app-text-sub text-sm">Đăng ngày: <%= new Date(chapter.created_at).toLocaleDateString('vi-VN') %></p>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 px-4 text-sm font-bold sticky top-[60px] md:top-[70px] app-paper py-3 border-b app-border z-40 shadow-sm transition-colors duration-300">
+        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 px-4 text-sm font-bold sticky top-[64px] app-paper py-3 border-b app-border z-40 shadow-sm transition-colors duration-300">
             <% if (prevChapter) { %>
                 <a href="/read/<%= prevChapter.id %>" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center">
                     ⬅ <span class="hidden md:inline ml-1">Trước</span>
@@ -103,11 +98,11 @@
                 <button class="btn-nav opacity-50 cursor-not-allowed px-3 py-2 rounded">⬅ <span class="hidden md:inline ml-1">Trước</span></button>
             <% } %>
 
-            <button onclick="toggleTOC()" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 cursor-pointer">
+            <button id="toc-btn" type="button" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2">
                 <span>📑</span> <span class="hidden sm:inline">Mục lục</span>
             </button>
 
-            <button onclick="toggleTheme()" id="theme-btn" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 text-yellow-600 dark:text-yellow-400 cursor-pointer">
+            <button id="theme-btn" type="button" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
                 <span id="theme-icon">☀</span> <span class="hidden sm:inline">Giao diện</span>
             </button>
 
@@ -132,7 +127,6 @@
             <% } else { %>
                 <button class="bg-gray-300 dark:bg-gray-700 text-white px-6 py-3 rounded cursor-not-allowed">⬅ Chương trước</button>
             <% } %>
-
             <% if (nextChapter) { %>
                 <a href="/read/<%= nextChapter.id %>" class="bg-indigo-600 text-white px-6 py-3 rounded shadow hover:bg-indigo-700 transition">
                     Chương sau ➡
@@ -146,49 +140,68 @@
 </div>
 
 <script>
-    // --- 1. XỬ LÝ MỤC LỤC ---
-    function toggleTOC() {
-        const modal = document.getElementById('toc-modal');
-        if (modal.classList.contains('hidden')) {
-            modal.classList.remove('hidden');
-            const activeChapter = modal.querySelector('.border-l-4'); // Tìm chương đang đọc
-            if(activeChapter) activeChapter.scrollIntoView({ block: "center" });
-        } else {
-            modal.classList.add('hidden');
+    // Chờ cho trang web tải xong hoàn toàn mới chạy code JS
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Script Read Page Loaded");
+
+        // --- 1. XỬ LÝ MỤC LỤC ---
+        const tocModal = document.getElementById('toc-modal');
+        const tocBtn = document.getElementById('toc-btn');
+        const closeTocBtn = document.getElementById('close-toc-btn');
+
+        function openTOC() {
+            if(tocModal) {
+                tocModal.classList.remove('hidden');
+                // Cuộn tới chương đang đọc
+                const activeChapter = tocModal.querySelector('.border-l-4'); 
+                if(activeChapter) activeChapter.scrollIntoView({ block: "center" });
+            }
         }
-    }
-    document.getElementById('toc-modal').addEventListener('click', function(e) {
-        if (e.target === this) toggleTOC();
-    });
 
-    // --- 2. XỬ LÝ DARK MODE (NÂNG CẤP) ---
-    const themeBtn = document.getElementById('theme-btn');
-    const themeIcon = document.getElementById('theme-icon');
-    const body = document.body;
+        function closeTOC() {
+            if(tocModal) tocModal.classList.add('hidden');
+        }
 
-    // Kiểm tra cài đặt cũ trong máy
-    const savedTheme = localStorage.getItem('theme');
-    
-    // Nếu trước đó chọn dark thì bật lên ngay lập tức
-    if (savedTheme === 'dark') {
-        body.classList.add('dark-mode');
-        if(themeIcon) themeIcon.innerText = '🌙'; 
-    } else {
-        if(themeIcon) themeIcon.innerText = '☀'; 
-    }
-
-    // Hàm chuyển đổi
-    function toggleTheme() {
-        body.classList.toggle('dark-mode');
+        // Gán sự kiện click
+        if(tocBtn) tocBtn.addEventListener('click', openTOC);
+        if(closeTocBtn) closeTocBtn.addEventListener('click', closeTOC);
         
-        if (body.classList.contains('dark-mode')) {
-            localStorage.setItem('theme', 'dark');
+        // Bấm ra ngoài popup để đóng
+        if(tocModal) {
+            tocModal.addEventListener('click', function(e) {
+                if (e.target === this) closeTOC();
+            });
+        }
+
+
+        // --- 2. XỬ LÝ DARK MODE ---
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        // Kiểm tra LocalStorage ngay khi vào trang
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
             if(themeIcon) themeIcon.innerText = '🌙';
         } else {
-            localStorage.setItem('theme', 'light');
             if(themeIcon) themeIcon.innerText = '☀';
         }
-    }
+
+        if(themeBtn) {
+            themeBtn.addEventListener('click', function() {
+                body.classList.toggle('dark-mode');
+                
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                    if(themeIcon) themeIcon.innerText = '🌙';
+                } else {
+                    localStorage.setItem('theme', 'light');
+                    if(themeIcon) themeIcon.innerText = '☀';
+                }
+            });
+        }
+    });
 </script>
 
 <%- include('partials/footer') %>

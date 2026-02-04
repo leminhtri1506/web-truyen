@@ -5,7 +5,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-    /* CẤU HÌNH MÀU SẮC CHO 2 CHẾ ĐỘ */
+    /* CẤU HÌNH MÀU SẮC & CỠ CHỮ */
     :root {
         --bg-body: #f9f9f9;
         --bg-paper: #ffffff;
@@ -14,6 +14,9 @@
         --border-color: #e2e8f0;
         --hover-bg: #edf2f7;
         --highlight: #4f46e5;
+        
+        /* BIẾN CỠ CHỮ (Mặc định 20px) */
+        --font-size: 20px;
     }
 
     /* DARK MODE */
@@ -27,14 +30,19 @@
         --highlight: #818cf8;
     }
 
-    /* Áp dụng biến màu */
+    /* Áp dụng biến */
     .app-bg { background-color: var(--bg-body); color: var(--text-primary); transition: background 0.3s, color 0.3s; }
     .app-paper { background-color: var(--bg-paper); border-color: var(--border-color); }
     .app-text-main { color: var(--text-primary); }
     .app-text-sub { color: var(--text-secondary); }
     .app-border { border-color: var(--border-color); }
     
-    .font-reading { font-family: 'Merriweather', serif; font-size: 1.25rem; line-height: 2; }
+    /* Font chữ đọc truyện: Sử dụng biến --font-size */
+    .font-reading { 
+        font-family: 'Merriweather', serif; 
+        font-size: var(--font-size); /* <--- QUAN TRỌNG */
+        line-height: 1.8; /* Giãn dòng tỉ lệ theo cỡ chữ */
+    }
     .font-ui { font-family: 'Nunito', sans-serif; }
 
     /* Scrollbar */
@@ -47,11 +55,15 @@
         background-color: var(--bg-paper);
         border: 1px solid var(--border-color);
         color: var(--text-secondary);
-        cursor: pointer; /* Bắt buộc có để click được */
+        cursor: pointer;
         position: relative;
-        z-index: 50; /* Đảm bảo nút nổi lên trên */
+        z-index: 50;
+        user-select: none; /* Chống bôi đen khi bấm nhanh */
     }
     body.dark-mode .btn-nav:hover { background-color: var(--hover-bg); color: var(--text-primary); }
+    
+    /* Hiệu ứng khi bấm nút */
+    .btn-nav:active { transform: scale(0.95); }
 </style>
 
 <div class="app-bg min-h-screen pb-10 font-ui relative">
@@ -89,37 +101,46 @@
             <p class="app-text-sub text-sm">Đăng ngày: <%= new Date(chapter.created_at).toLocaleDateString('vi-VN') %></p>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 px-4 text-sm font-bold sticky top-[64px] app-paper py-3 border-b app-border z-40 shadow-sm transition-colors duration-300">
+        <div class="flex flex-wrap justify-center gap-2 mb-8 px-2 text-sm font-bold sticky top-[64px] app-paper py-3 border-b app-border z-40 shadow-sm transition-colors duration-300">
             <% if (prevChapter) { %>
-                <a href="/read/<%= prevChapter.id %>" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center">
-                    ⬅ <span class="hidden md:inline ml-1">Trước</span>
+                <a href="/read/<%= prevChapter.id %>" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center" title="Chương trước">
+                    ⬅
                 </a>
             <% } else { %>
-                <button class="btn-nav opacity-50 cursor-not-allowed px-3 py-2 rounded">⬅ <span class="hidden md:inline ml-1">Trước</span></button>
+                <button class="btn-nav opacity-50 cursor-not-allowed px-3 py-2 rounded">⬅</button>
             <% } %>
 
-            <button id="toc-btn" type="button" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2">
+            <button id="toc-btn" type="button" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center gap-2" title="Mục lục">
                 <span>📑</span> <span class="hidden sm:inline">Mục lục</span>
             </button>
 
-            <button id="theme-btn" type="button" class="btn-nav px-4 py-2 rounded hover:shadow transition flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
-                <span id="theme-icon">☀</span> <span class="hidden sm:inline">Giao diện</span>
+            <div class="flex">
+                <button id="font-decrease" type="button" class="btn-nav px-3 py-2 rounded-l border-r-0 hover:shadow transition" title="Giảm cỡ chữ">
+                    A-
+                </button>
+                <button id="font-increase" type="button" class="btn-nav px-3 py-2 rounded-r hover:shadow transition" title="Tăng cỡ chữ">
+                    A+
+                </button>
+            </div>
+
+            <button id="theme-btn" type="button" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center gap-2 text-yellow-600 dark:text-yellow-400" title="Giao diện Sáng/Tối">
+                <span id="theme-icon">☀</span>
             </button>
 
             <% if (nextChapter) { %>
-                <a href="/read/<%= nextChapter.id %>" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center">
-                    <span class="hidden md:inline mr-1">Sau</span> ➡
+                <a href="/read/<%= nextChapter.id %>" class="btn-nav px-3 py-2 rounded hover:shadow transition flex items-center" title="Chương sau">
+                    ➡
                 </a>
             <% } else { %>
-                <button class="btn-nav opacity-50 cursor-not-allowed px-3 py-2 rounded"><span class="hidden md:inline mr-1">Sau</span> ➡</button>
+                <button class="btn-nav opacity-50 cursor-not-allowed px-3 py-2 rounded">➡</button>
             <% } %>
         </div>
 
-        <div class="px-6 md:px-12 text-justify whitespace-pre-wrap font-reading app-text-main transition-colors duration-300">
+        <div class="px-4 md:px-12 text-justify whitespace-pre-wrap font-reading app-text-main transition-colors duration-300 pb-10">
             <%= chapter.content %>
         </div>
 
-        <div class="flex justify-center gap-4 mt-12 mb-8 px-4 border-t app-border pt-8 text-sm font-bold">
+        <div class="flex justify-center gap-4 mt-8 mb-8 px-4 border-t app-border pt-8 text-sm font-bold">
             <% if (prevChapter) { %>
                 <a href="/read/<%= prevChapter.id %>" class="bg-indigo-600 text-white px-6 py-3 rounded shadow hover:bg-indigo-700 transition">
                     ⬅ Chương trước
@@ -140,9 +161,8 @@
 </div>
 
 <script>
-    // Chờ cho trang web tải xong hoàn toàn mới chạy code JS
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("Script Read Page Loaded");
+        console.log("Read Page Loaded");
 
         // --- 1. XỬ LÝ MỤC LỤC ---
         const tocModal = document.getElementById('toc-modal');
@@ -152,34 +172,27 @@
         function openTOC() {
             if(tocModal) {
                 tocModal.classList.remove('hidden');
-                // Cuộn tới chương đang đọc
                 const activeChapter = tocModal.querySelector('.border-l-4'); 
                 if(activeChapter) activeChapter.scrollIntoView({ block: "center" });
             }
         }
-
         function closeTOC() {
             if(tocModal) tocModal.classList.add('hidden');
         }
 
-        // Gán sự kiện click
         if(tocBtn) tocBtn.addEventListener('click', openTOC);
         if(closeTocBtn) closeTocBtn.addEventListener('click', closeTOC);
-        
-        // Bấm ra ngoài popup để đóng
         if(tocModal) {
             tocModal.addEventListener('click', function(e) {
                 if (e.target === this) closeTOC();
             });
         }
 
-
         // --- 2. XỬ LÝ DARK MODE ---
         const themeBtn = document.getElementById('theme-btn');
         const themeIcon = document.getElementById('theme-icon');
         const body = document.body;
 
-        // Kiểm tra LocalStorage ngay khi vào trang
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             body.classList.add('dark-mode');
@@ -191,13 +204,47 @@
         if(themeBtn) {
             themeBtn.addEventListener('click', function() {
                 body.classList.toggle('dark-mode');
-                
                 if (body.classList.contains('dark-mode')) {
                     localStorage.setItem('theme', 'dark');
                     if(themeIcon) themeIcon.innerText = '🌙';
                 } else {
                     localStorage.setItem('theme', 'light');
                     if(themeIcon) themeIcon.innerText = '☀';
+                }
+            });
+        }
+
+        // --- 3. XỬ LÝ CỠ CHỮ (NEW) ---
+        const btnIncrease = document.getElementById('font-increase');
+        const btnDecrease = document.getElementById('font-decrease');
+        const rootElement = document.documentElement; // Thẻ <html>
+
+        // Cỡ chữ mặc định
+        let currentFontSize = parseInt(localStorage.getItem('fontSize')) || 20;
+
+        // Hàm áp dụng cỡ chữ
+        function applyFontSize(size) {
+            rootElement.style.setProperty('--font-size', size + 'px');
+            localStorage.setItem('fontSize', size);
+        }
+
+        // Áp dụng ngay khi vào trang
+        applyFontSize(currentFontSize);
+
+        if(btnIncrease) {
+            btnIncrease.addEventListener('click', function() {
+                if (currentFontSize < 32) { // Giới hạn max 32px
+                    currentFontSize += 2;
+                    applyFontSize(currentFontSize);
+                }
+            });
+        }
+
+        if(btnDecrease) {
+            btnDecrease.addEventListener('click', function() {
+                if (currentFontSize > 14) { // Giới hạn min 14px
+                    currentFontSize -= 2;
+                    applyFontSize(currentFontSize);
                 }
             });
         }
